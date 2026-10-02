@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0d1117">
+
+<title>Alpha Trade | ألفا تريد</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@400;600;800&display=swap"
+  rel="stylesheet"
+>
+
+<link rel="stylesheet" href="style.css">
+
+<script>window.__failed = [];</script>
+</head>
+
+<body>
+
+<header class="hdr">
+
+  <a class="logo" href="#/">
+    ALPHA<b>TRADE</b>
+  </a>
+
+  <nav id="nav" class="nav">
+    <a href="#/" data-t="nav_home"></a>
+    <a href="#/products" data-t="nav_products"></a>
+    <a href="#/categories" data-t="nav_categories"></a>
+    <a href="#/about" data-t="nav_about"></a>
+  </nav>
+
+  <input
+    id="q"
+    class="q"
+    type="search"
+    data-tp="search_ph"
+    autocomplete="off"
+  >
+
+  <button
+    class="btn ghost"
+    data-act="lang"
+    id="langBtn"
+    type="button"
+  ></button>
+
+  <a
+    class="cartlink"
+    href="#/cart"
+    aria-label="Cart"
+  >
+    🛒
+    <span id="badge" class="badge">0</span>
+  </a>
+
+  <button
+    class="burger"
+    data-act="menu"
+    aria-label="Menu"
+    type="button"
+  >
+    ☰
+  </button>
+
+</header>
+
+<main id="view" class="wrap">
+  <div class="state"><div class="spin"></div></div>
+</main>
+
+<footer class="ftr">
+  <div class="footer-content">
+<!-- تواصل معنا -->
+<div class="footer-column">
+  <h3>تواصل معنا</h3>
+
+  <a class="footer-contact-item" href="tel:+201027596521">
+    <span class="footer-icon">📱</span>
+    <span>
+      <strong>اتصل بنا</strong>
+      <small>01027596521</small>
+    </span>
+  </a>
+
+  <a class="footer-contact-item"
+     href="https://wa.me/201027596521"
+     target="_blank"
+     rel="noopener">
+    <span class="footer-icon">💬</span>
+    <span>
+      <strong>WhatsApp</strong>
+      <small>تواصل معنا عبر واتساب</small>
+    </span>
+  </a>
+
+  <a class="footer-contact-item"
+     href="mailto:A.farahat610@gmail.com">
+    <span class="footer-icon">✉️</span>
+    <span>
+      <strong>Email</strong>
+      <small>A.farahat610@gmail.com</small>
+    </span>
+  </a>
+</div>
+
+<div class="footer-column">
+  <h3>تابعنا</h3>
+
+  <!-- ضع رابط جروب WhatsApp هنا -->
+  <a class="footer-contact-item"
+     href=""
+     target="_blank"
+     rel="noopener">
+    <span class="footer-icon">💬</span>
+    <span>
+      <strong>WhatsApp Group</strong>
+      <small>انضم إلى جروب واتساب</small>
+    </span>
+  </a>
+
+  <!-- ضع رابط جروب Facebook هنا -->
+  <a class="footer-contact-item"
+     href=""
+     target="_blank"
+     rel="noopener">
+    <span class="footer-icon">f</span>
+    <span>
+      <strong>Facebook Group</strong>
+      <small>تابعنا على فيسبوك</small>
+    </span>
+  </a>
+
+  <!-- ضع رابط Instagram هنا -->
+  <a class="footer-contact-item"
+     href=""
+     target="_blank"
+     rel="noopener">
+    <span class="footer-icon">◎</span>
+    <span>
+      <strong>Instagram</strong>
+      <small>تابعنا على إنستجرام</small>
+    </span>
+  </a>
+</div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <span id="ftr"></span>
+  </div>
+</footer>
+
+
+<div
+  id="toast"
+  class="toast"
+  role="status"
+  aria-live="polite"
+></div>
+
+<noscript>
+  <p style="padding:24px;text-align:center">يجب تفعيل JavaScript لعرض المتجر · Please enable JavaScript.</p>
+</noscript>
+
+<script src="translations.js" onerror="window.__failed.push('translations.js')"></script>
+<script src="supabase.js" onerror="window.__failed.push('supabase.js')"></script>
+<script src="api.js" onerror="window.__failed.push('api.js')"></script>
+<script src="cart.js" onerror="window.__failed.push('cart.js')"></script>
+<script src="search.js" onerror="window.__failed.push('search.js')"></script>
+<script src="app.js" onerror="window.__failed.push('app.js')"></script>
+
+</body>
+</html>
