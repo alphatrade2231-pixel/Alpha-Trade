@@ -341,3 +341,51 @@ padding: 35px 18px;
     font-size: clamp(1.45rem, 5vw, 2.2rem);
   }
 }
+
+/* Alpha Trade — Centered Brand */
+.home-brand {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 34px 16px 28px;
+  direction: ltr;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.home-brand-alpha,
+.home-brand-trade {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(32px, 5.5vw, 66px);
+  font-weight: 900;
+  letter-spacing: 2px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.home-brand-alpha {
+  color: var(--txt, #111827);
+}
+
+.home-brand-trade {
+  color: var(--brand, #d62828);
+}
+
+.home-brand-line {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .home-brand {
+    gap: 9px;
+    padding: 28px 10px 22px;
+  }
+
+  .home-brand-alpha,
+  .home-brand-trade {
+    letter-spacing: 1px;
+  }
+}
+
