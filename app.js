@@ -616,7 +616,8 @@
     d.querySelectorAll('#nav a').forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === map[name]); });
   }
 
-  function route(keep) {
+  
+function route(keep) {
     var r = parse();
     markNav(r.name);
     var nav = $('#nav'); if (nav) nav.classList.remove('open');
@@ -632,7 +633,8 @@
       view(errorHtml(t('err_title'), t('err_msg'), e && e.message, false));
     }
     if (keep !== true) w.scrollTo(0, 0);
-  }
+}
+
 
   /* ---------- Static UI ---------- */
   function applyStatic() {
