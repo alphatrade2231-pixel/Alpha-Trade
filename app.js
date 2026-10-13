@@ -88,7 +88,7 @@
   function card(p) {
     var href = '#/product/' + enc(p.id);
     var tags = [p.viscosity, p.size].filter(Boolean).map(function (x) { return '<span class="tag">' + esc(x) + '</span>'; }).join('');
-    var ws = p.carton > 0 && p.wholesale > 0 ? '<small>' + esc(t('wholesale')) + ': ' + money(p.wholesale) + ' / ' + p.carton + '+</small>' : '';
+    var ws = '';
     return '<article class="card"><a href="' + href + '">' + ph(p) + '</a><div class="card-b">' +
       (p.brand ? '<span class="brand">' + esc(p.brand) + '</span>' : '') +
       '<h3><a href="' + href + '">' + esc(pname(p)) + '</a></h3>' +
@@ -195,7 +195,7 @@
       .filter(function (x) { return x[1]; })
       .map(function (x) { return '<tr><th>' + esc(t(x[0])) + '</th><td>' + esc(x[1]) + '</td></tr>'; }).join('');
     var related = S.products.filter(function (x) { return x.categoryId === p.categoryId && x.id !== p.id; }).slice(0, 4);
-    var ws = p.carton > 0 && p.wholesale > 0 ? '<div class="mut">' + esc(t('wholesale_note', { price: money(p.wholesale), n: p.carton })) + '</div>' : '';
+   var ws = '';
     var st = stockState(p);
 
     view(
@@ -227,7 +227,7 @@
       c.lines.map(function (l) {
         var p = l.product;
         return '<div class="line">' + ph(p) + '<div><h4><a href="#/product/' + enc(p.id) + '">' + esc(pname(p)) + '</a></h4>' +
-          '<div class="mut">' + esc(t('unit')) + ': ' + money(l.unit) + ' · ' + esc(l.tier === 'wholesale' ? t('tier_w') : t('tier_r')) + '</div>' +
+          ''
           '<div class="ctl"><div class="qty"><button type="button" data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
           '<input type="number" min="1" value="' + l.qty + '" data-act="qty" data-id="' + esc(p.id) + '" inputmode="numeric">' +
           '<button type="button" data-act="inc" data-id="' + esc(p.id) + '">+</button></div>' +
