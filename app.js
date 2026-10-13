@@ -226,13 +226,14 @@
       '<div class="page-h"><h1>' + esc(t('cart_title')) + '</h1></div><div class="two-col"><div>' +
       c.lines.map(function (l) {
         var p = l.product;
+       
         return '<div class="line">' + ph(p) + '<div><h4><a href="#/product/' + enc(p.id) + '">' + esc(pname(p)) + '</a></h4>' +
-          '<div class="ctl"><div class="qty"><button type="button" data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
           '<div class="ctl"><div class="qty"><button type="button" data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
           '<input type="number" min="1" value="' + l.qty + '" data-act="qty" data-id="' + esc(p.id) + '" inputmode="numeric">' +
           '<button type="button" data-act="inc" data-id="' + esc(p.id) + '">+</button></div>' +
           '<button class="rm" type="button" data-act="remove" data-id="' + esc(p.id) + '">' + esc(t('remove')) + '</button></div></div>' +
           '<div class="sub">' + money(l.subtotal) + '</div></div>';
+
       }).join('') + '</div>' +
       '<aside class="sum"><h3>' + esc(t('summary')) + '</h3>' +
       '<div class="r t"><span>' + esc(t('total')) + '</span><span>' + money(c.total) + '</span></div>' +
