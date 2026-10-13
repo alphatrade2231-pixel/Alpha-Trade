@@ -227,7 +227,7 @@
       c.lines.map(function (l) {
         var p = l.product;
         return '<div class="line">' + ph(p) + '<div><h4><a href="#/product/' + enc(p.id) + '">' + esc(pname(p)) + '</a></h4>' +
-          ''
+          '<div class="ctl"><div class="qty"><button type="button" data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
           '<div class="ctl"><div class="qty"><button type="button" data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
           '<input type="number" min="1" value="' + l.qty + '" data-act="qty" data-id="' + esc(p.id) + '" inputmode="numeric">' +
           '<button type="button" data-act="inc" data-id="' + esc(p.id) + '">+</button></div>' +
