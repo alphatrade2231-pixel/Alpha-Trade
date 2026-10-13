@@ -216,19 +216,24 @@
     );
   };
 
+
   VIEWS.cart = function () {
     var c = Cart.lines(S.byId);
+
     if (!c.lines.length) {
       view('<div class="state"><div class="ico">🛒</div><h2>' + esc(t('cart_empty')) + '</h2><a class="btn" href="#/products">' + esc(t('continue')) + '</a></div>');
       return;
     }
+
     view(
       '<div class="page-h"><h1>' + esc(t('cart_title')) + '</h1></div><div class="two-col"><div>' +
       c.lines.map(function (l) {
         var p = l.product;
-        return '<div class="line">' + ph(p) + '<div><h4><a href="#/product/' + enc(p.id) + '">' + esc(pname(p)) + '</a></h4>' +
-          '<div class="mut">' + esc(t('unit')) + ': ' + money(l.unit) + ' · ' + esc(l.tier === 'wholesale' ? t('tier_w') : t('tier_r')) + '</div>' +
-          '<div class="ctl"><div class="qty"><button type="button" data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
+
+        return '<div class="line">' + ph(p) +
+          '<div><h4><a href="#/product/' + enc(p.id) + '">' + esc(pname(p)) + '</a></h4>' +
+          '<div class="ctl"><div class="qty">' +
+          '<button type="button" data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
           '<input type="number" min="1" value="' + l.qty + '" data-act="qty" data-id="' + esc(p.id) + '" inputmode="numeric">' +
           '<button type="button" data-act="inc" data-id="' + esc(p.id) + '">+</button></div>' +
           '<button class="rm" type="button" data-act="remove" data-id="' + esc(p.id) + '">' + esc(t('remove')) + '</button></div></div>' +
@@ -241,6 +246,7 @@
       '<a class="btn ghost block" style="margin-top:10px;color:var(--txt)" href="#/products">' + esc(t('continue')) + '</a></aside></div>'
     );
   };
+
 
   function fld(id, label, type, opt, extra) {
     return '<div class="fld" id="w_' + id + '"><label for="' + id + '">' + esc(label) + (opt ? ' <span class="mut">(' + esc(t('optional')) + ')</span>' : '') + '</label>' +
