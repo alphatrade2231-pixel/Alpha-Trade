@@ -88,12 +88,11 @@
   function card(p) {
     var href = '#/product/' + enc(p.id);
     var tags = [p.viscosity, p.size].filter(Boolean).map(function (x) { return '<span class="tag">' + esc(x) + '</span>'; }).join('');
-    var ws = p.carton > 0 && p.wholesale > 0 ? '<small>' + esc(t('wholesale')) + ': ' + money(p.wholesale) + ' / ' + p.carton + '+</small>' : '';
     return '<article class="card"><a href="' + href + '">' + ph(p) + '</a><div class="card-b">' +
       (p.brand ? '<span class="brand">' + esc(p.brand) + '</span>' : '') +
       '<h3><a href="' + href + '">' + esc(pname(p)) + '</a></h3>' +
       '<div class="tags">' + tags + '</div>' +
-      '<div class="price">' + money(p.retail) + ws + '</div>' +
+      '<div class="price">' + money(p.retail) + '</div>' +
       '<button class="btn sm" type="button" data-act="add" data-id="' + esc(p.id) + '"' + (p.stock <= 0 ? ' disabled' : '') + '>' +
       esc(p.stock <= 0 ? t('out_stock') : t('add_cart')) + '</button></div></article>';
   }
@@ -195,7 +194,6 @@
       .filter(function (x) { return x[1]; })
       .map(function (x) { return '<tr><th>' + esc(t(x[0])) + '</th><td>' + esc(x[1]) + '</td></tr>'; }).join('');
     var related = S.products.filter(function (x) { return x.categoryId === p.categoryId && x.id !== p.id; }).slice(0, 4);
-    var ws = p.carton > 0 && p.wholesale > 0 ? '<div class="mut">' + esc(t('wholesale_note', { price: money(p.wholesale), n: p.carton })) + '</div>' : '';
     var st = stockState(p);
 
     view(
@@ -206,7 +204,7 @@
       }).join('') + '</div>' : '') + '</div>' +
       '<div>' + (p.brand ? '<span class="brand">' + esc(p.brand) + '</span>' : '') +
       '<h1>' + esc(pname(p)) + '</h1>' +
-      '<div class="pbox"><div class="big">' + money(p.retail) + '</div>' + ws +
+      '<div class="pbox"><div class="big">' + money(p.retail) + '</div>' +
       '<span class="st ' + st + '">' + esc(stockLabel(p)) + '</span>' +
       '<div class="buy"><div class="qty"><button type="button" data-act="pdec">−</button><input id="pq" type="number" min="1" value="1" inputmode="numeric" aria-label="' + esc(t('qty')) + '"><button type="button" data-act="pinc">+</button></div>' +
       '<button class="btn" type="button" data-act="addq" data-id="' + esc(p.id) + '"' + (p.stock <= 0 ? ' disabled' : '') + '>' + esc(p.stock <= 0 ? t('out_stock') : t('add_cart')) + '</button></div></div>' +
