@@ -1,19 +1,18 @@
 
-(function () {
+(function (w) {
   'use strict';
 
-  // رقم واتساب التجريبي الخاص بأدهم
+  // رقم واتساب الاختبار — غيّره لاحقًا لرقم صاحب الموقع
   var WHATSAPP_NUMBER = '201114094278';
 
-  // تجهيز رسالة تفاصيل الطلب
-  function buildMessage(order, customer, items) {
-    customer = customer || {};
-    items = Array.isArray(items) ? items : [];
+  function buildMessage(order) {
+    var customer = order.customer || {};
+    var items = order.items || [];
 
     var lines = [
       '🛒 طلب جديد - Alpha Trade',
-      '━━━━━━━━━━━━━━━━',
-      '🔢 رقم الطلب: ' + (order.orderId || order.order_id || 'غير متاح'),
+      '━━━━━━━━━━━━━━━━━━',
+      '🔢 رقم الطلب: ' + (order.orderId || 'غير متاح'),
       '',
       '👤 بيانات العميل',
       'الاسم: ' + (customer.name || 'غير متاح'),
@@ -25,53 +24,39 @@
       'الموديل: ' + (customer.carModel || 'غير محدد'),
       'السنة: ' + (customer.carYear || 'غير محددة'),
       '',
-      '📦 تفاصيل المنتجات'
+      '📦 المنتجات'
     ];
 
     items.forEach(function (item, index) {
-      var name = item.name || item.product_name || 'منتج';
-      var qty = Number(item.qty || item.quantity) || 0;
-      var price = Number(item.unit || item.unit_price) || 0;
-      var subtotal = Number(item.subtotal);
-
-      if (!Number.isFinite(subtotal)) subtotal = qty * price;
-
       lines.push(
-        (index + 1) + '. ' + name,
-        '   الكمية: ' + qty,
-        '   سعر الوحدة: ' + price.toFixed(2),
-        '   الإجمالي: ' + subtotal.toFixed(2) + ' جنيه'
+        (index + 1) + '. ' + item.name,
+        '   الكمية: ' + item.qty,
+        '   سعر الوحدة: ' + Number(item.unit || 0).toFixed(2),
+        '   الإجمالي: ' + Number(item.subtotal || 0).toFixed(2)
       );
     });
 
     lines.push(
       '',
-      '💰 إجمالي الطلب: ' +
-        (Number(order.total) || 0).toFixed(2) + ' جنيه',
+      '💰 إجمالي الطلب: ' + Number(order.total || 0).toFixed(2),
       '💳 طريقة الدفع: ' +
-        (customer.pay === 'cod' ? 'الدفع عند الاستلام' :
-         customer.pay === 'online' ? 'دفع إلكتروني' :
-         customer.pay || 'غير محددة'),
-      '',
+        (customer.pay === 'cod' ? 'الدفع عند الاستلام' : customer.pay),
       '📝 ملاحظات: ' + (customer.notes || 'لا توجد'),
-      '━━━━━━━━━━━━━━━━'
+      '',
+      'برجاء مراجعة الطلب وتأكيده.',
+      'Alpha Trade'
     );
 
     return lines.join('\n');
   }
 
-  // فتح واتساب برسالة جاهزة
-  function openWhatsApp(order, customer, items) {
-    var message = buildMessage(order, customer, items);
-    var url = 'https://wa.me/' + WHATSAPP_NUMBER +
-      '?text=' + encodeURIComponent(message);
-
-    window.open(url, '_blank', 'noopener,noreferrer');
+  function url(order) {
+    return 'https://wa.me/' + WHATSAPP_NUMBER +
+      '?text=' + encodeURIComponent(buildMessage(order));
   }
 
-  // إتاحة الوظيفة لباقي ملفات الموقع
-  window.AlphaWhatsApp = {
-    buildMessage: buildMessage,
-    open: openWhatsApp
+  w.AlphaWhatsApp = {
+    url: url,
+    buildMessage: buildMessage
   };
-})();
+})(window);
