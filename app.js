@@ -279,26 +279,17 @@
   };
 
  
+
 VIEWS.success = function () {
   if (!S.last) {
     location.hash = '#/';
     return;
   }
 
-  var wa = String(S.settings.whatsapp || '').replace(/\D/g, '');
   var order = S.last;
-
-  var message = [
-    'طلب جديد - Alpha Trade',
-    'رقم الطلب: ' + order.orderId,
-    'الإجمالي: ' + order.total,
-    'نوع الطلب: ' + order.orderType,
-    '',
-    'برجاء تأكيد الطلب. شكراً لكم.'
-  ].join('\n');
-
-  var url = 'https://wa.me/' + wa + '?text=' +
-    encodeURIComponent(message);
+  var url = w.AlphaWhatsApp
+    ? w.AlphaWhatsApp.url(order)
+    : '#/';
 
   view(
     '<div class="state">' +
@@ -307,16 +298,15 @@ VIEWS.success = function () {
     '<p>' + esc(t('ok_msg')) + '</p>' +
     '<p><b>' + esc(t('ok_id')) + ':</b> ' +
     '<span dir="ltr">' + esc(order.orderId) + '</span></p>' +
-    (wa
-      ? '<a class="btn" href="' + url +
-        '" target="_blank" rel="noopener">' +
-        esc(t('ok_wa')) + '</a>'
-      : '<p>يرجى ضبط رقم واتساب في إعدادات الموقع.</p>') +
+    '<a class="btn" href="' + esc(url) +
+    '" target="_blank" rel="noopener">' +
+    'فتح تفاصيل الطلب على واتساب' + '</a>' +
     '<a class="btn dark" href="#/">' +
     esc(t('back_home')) + '</a>' +
     '</div>'
   );
 };
+
 
   VIEWS.notfound = function () {
     view('<div class="state"><div class="ico">🔍</div><h2>' + esc(t('not_found')) + '</h2><a class="btn" href="#/">' + esc(t('back_home')) + '</a></div>');
@@ -389,13 +379,20 @@ VIEWS.success = function () {
     }
     v.phone = ph2;
 
-    var btn = $('#co_btn'); btn.disabled = true; btn.textContent = t('placing');
-    try {
-      var lines = Cart.items().map(function (i) { return { id: i.id, qty: i.qty }; });
-      var res = await Api.createOrder({ customer: v, lines: lines });
+    var btn = $('#co_btn');
+btn.disabled = true;
+btn.textContent = t('placing');
+
+// نحجز نافذة أثناء ضغطة المستخدم لتقليل احتمال منعها
+var waTab = w.open('about:blank', '_blank');
 
 try {
+      var lines = Cart.items().map(function (i) { return { id: i.id, qty: i.qty }; });
+      var res = await Api.createOrder({ customer: v, lines: lines });
   var cartData = Cart.lines(S.byId);
+
+try {
+  
 
   await w.SB.request('/functions/v1/dynamic-api', {
     method: 'POST',
@@ -428,11 +425,37 @@ try {
   console.error('[order-email]', emailError);
 }
 
-S.last = res;
+S.last = {
+  orderId: res.orderId,
+  total: res.total,
+  orderType: res.orderType,
+  customer: v,
+  items: cartData.lines.map(function (l) {
+    return {
+      name: pname(l.product),
+      qty: l.qty,
+      unit: l.unit,
+      subtotal: l.subtotal
+    };
+  })
+};
+
+// فتح رسالة واتساب بعد نجاح تسجيل الطلب
+if (waTab && w.AlphaWhatsApp) {
+  try {
+    waTab.location.href = w.AlphaWhatsApp.url(S.last);
+  } catch (waError) {
+    console.error('[whatsapp]', waError);
+  }
+}
+
 Cart.clear();
 location.hash = '#/success';
     } catch (e) {
-      console.error('[createOrder]', e);
+     if (waTab && !waTab.closed) {
+  waTab.close();
+}
+  console.error('[createOrder]', e);
       if (e.code === 'CART_INVALID') {
         var msgs = [];
         (e.issues || []).forEach(function (is) {
