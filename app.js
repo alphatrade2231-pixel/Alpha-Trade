@@ -65,6 +65,46 @@
     return '<span class="ph ' + (cls || '') + '">' + img + '</span>';
   }
 
+  /* ---------- WhatsApp: رسالة الأوردر الجاهزة لصاحب الشركة ---------- */
+  var OWNER_WHATSAPP = '201114094278'; // 01114094278 بالصيغة الدولية لمصر (بدون + وبدون 0)
+
+  function waNum(n) {
+    return Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
+  function waMessage(order) {
+    var c = order.customer || {};
+    var currency = cur();
+    var L = [];
+    L.push('🛒 *أوردر جديد - Alpha Trade*');
+    L.push('رقم الأوردر: ' + order.orderId);
+    if (order.orderType) L.push('نوع الطلب: ' + (String(order.orderType).toLowerCase() === 'wholesale' ? 'جملة' : 'قطاعي'));
+    L.push('');
+    L.push('👤 *بيانات العميل*');
+    L.push('الاسم: ' + (c.name || '-'));
+    L.push('الموبايل: ' + (c.phone || '-'));
+    L.push('العنوان: ' + (c.address || '-'));
+    if (c.carType || c.carModel || c.carYear) {
+      L.push('السيارة: ' + [c.carType, c.carModel, c.carYear].filter(Boolean).join(' '));
+    }
+    if (c.notes) L.push('ملاحظات: ' + c.notes);
+    L.push('');
+    L.push('📦 *الأصناف*');
+    (order.items || []).forEach(function (it, i) {
+      L.push((i + 1) + ') ' + it.name + ' × ' + it.qty + ' = ' + waNum(it.subtotal) + ' ' + currency);
+    });
+    L.push('');
+    L.push('💰 *الإجمالي: ' + waNum(order.total) + ' ' + currency + '*');
+    L.push('طريقة الدفع: الدفع عند الاستلام');
+    return L.join('\n');
+  }
+
+  w.AlphaWhatsApp = {
+    url: function (order) {
+      return 'https://wa.me/' + OWNER_WHATSAPP + '?text=' + encodeURIComponent(waMessage(order));
+    }
+  };
+
   /* ---------- States ---------- */
   function loadingHtml() { return '<div class="state"><div class="spin"></div><p>' + esc(t('loading')) + '</p></div>'; }
 
@@ -214,7 +254,6 @@
     );
   };
 
-
   VIEWS.cart = function () {
     var c = Cart.lines(S.byId);
 
@@ -244,7 +283,6 @@
       '<a class="btn ghost block" style="margin-top:10px;color:var(--txt)" href="#/products">' + esc(t('continue')) + '</a></aside></div>'
     );
   };
-
 
   function fld(id, label, type, opt, extra) {
     return '<div class="fld" id="w_' + id + '"><label for="' + id + '">' + esc(label) + (opt ? ' <span class="mut">(' + esc(t('optional')) + ')</span>' : '') + '</label>' +
@@ -278,35 +316,27 @@
     );
   };
 
- 
+  VIEWS.success = function () {
+    if (!S.last) {
+      location.hash = '#/';
+      return;
+    }
 
-VIEWS.success = function () {
-  if (!S.last) {
-    location.hash = '#/';
-    return;
-  }
+    var order = S.last;
+    var url = w.AlphaWhatsApp.url(order);
 
-  var order = S.last;
-  var url = w.AlphaWhatsApp
-    ? w.AlphaWhatsApp.url(order)
-    : '#/';
-
-  view(
-    '<div class="state">' +
-    '<div class="ok">✓</div>' +
-    '<h2>' + esc(t('ok_title')) + '</h2>' +
-    '<p>' + esc(t('ok_msg')) + '</p>' +
-    '<p><b>' + esc(t('ok_id')) + ':</b> ' +
-    '<span dir="ltr">' + esc(order.orderId) + '</span></p>' +
-    '<a class="btn" href="' + esc(url) +
-    '" target="_blank" rel="noopener">' +
-    'فتح تفاصيل الطلب على واتساب' + '</a>' +
-    '<a class="btn dark" href="#/">' +
-    esc(t('back_home')) + '</a>' +
-    '</div>'
-  );
-};
-
+    view(
+      '<div class="state">' +
+      '<div class="ok">✓</div>' +
+      '<h2>' + esc(t('ok_title')) + '</h2>' +
+      '<p>' + esc(t('ok_msg')) + '</p>' +
+      '<p><b>' + esc(t('ok_id')) + ':</b> <span dir="ltr">' + esc(order.orderId) + '</span></p>' +
+      '<p class="mut">' + esc(ar() ? 'جاري تحويلك إلى واتساب لإرسال تفاصيل الطلب...' : 'Redirecting you to WhatsApp to send the order details...') + '</p>' +
+      '<a class="btn" href="' + esc(url) + '">' + esc(ar() ? 'فتح واتساب الآن' : 'Open WhatsApp now') + '</a> ' +
+      '<a class="btn dark" href="#/">' + esc(t('back_home')) + '</a>' +
+      '</div>'
+    );
+  };
 
   VIEWS.notfound = function () {
     view('<div class="state"><div class="ico">🔍</div><h2>' + esc(t('not_found')) + '</h2><a class="btn" href="#/">' + esc(t('back_home')) + '</a></div>');
@@ -380,82 +410,72 @@ VIEWS.success = function () {
     v.phone = ph2;
 
     var btn = $('#co_btn');
-btn.disabled = true;
-btn.textContent = t('placing');
+    btn.disabled = true;
+    btn.textContent = t('placing');
 
-// نحجز نافذة أثناء ضغطة المستخدم لتقليل احتمال منعها
-var waTab = w.open('about:blank', '_blank');
-
-try {
+    try {
+      // نحفظ نسخة من السلة قبل ما نمسحها (للإيميل ولرسالة واتساب)
+      var cartData = Cart.lines(S.byId);
       var lines = Cart.items().map(function (i) { return { id: i.id, qty: i.qty }; });
+
       var res = await Api.createOrder({ customer: v, lines: lines });
-  var cartData = Cart.lines(S.byId);
 
-try {
-  
+      // إيميل الإشعار — لو فشل ما يمنعش باقي العملية
+      try {
+        await w.SB.request('/functions/v1/dynamic-api', {
+          method: 'POST',
+          body: {
+            order: {
+              order_id: res.orderId,
+              customer_name: v.name,
+              phone: v.phone,
+              address: v.address,
+              car_type: v.carType || null,
+              car_model: v.carModel || null,
+              car_year: v.carYear ? Number(v.carYear) : null,
+              notes: v.notes || null,
+              payment_method: v.pay || 'cod',
+              order_type: res.orderType,
+              total: res.total
+            },
+            items: cartData.lines.map(function (l) {
+              return {
+                product_name: pname(l.product),
+                quantity: l.qty,
+                unit_price: l.unit,
+                subtotal: l.subtotal
+              };
+            })
+          }
+        });
+      } catch (emailError) {
+        console.error('[order-email]', emailError);
+      }
 
-  await w.SB.request('/functions/v1/dynamic-api', {
-    method: 'POST',
-    body: {
-      order: {
-        order_id: res.orderId,
-        customer_name: v.name,
-        phone: v.phone,
-        address: v.address,
-        car_type: v.carType || null,
-        car_model: v.carModel || null,
-        car_year: v.carYear ? Number(v.carYear) : null,
-        notes: v.notes || null,
-        payment_method: v.pay || 'cod',
-        order_type: res.orderType,
-        total: res.total
-      },
-      items: cartData.lines.map(function (l) {
-        return {
-          product_name: pname(l.product),
-          quantity: l.qty,
-          unit_price: l.unit,
-          subtotal: l.subtotal
-        };
-      })
-    }
-  });
+      S.last = {
+        orderId: res.orderId,
+        total: res.total,
+        orderType: res.orderType,
+        customer: v,
+        items: cartData.lines.map(function (l) {
+          return {
+            name: pname(l.product),
+            qty: l.qty,
+            unit: l.unit,
+            subtotal: l.subtotal
+          };
+        })
+      };
 
-} catch (emailError) {
-  console.error('[order-email]', emailError);
-}
+      var waUrl = w.AlphaWhatsApp.url(S.last);
 
-S.last = {
-  orderId: res.orderId,
-  total: res.total,
-  orderType: res.orderType,
-  customer: v,
-  items: cartData.lines.map(function (l) {
-    return {
-      name: pname(l.product),
-      qty: l.qty,
-      unit: l.unit,
-      subtotal: l.subtotal
-    };
-  })
-};
+      Cart.clear();
+      location.hash = '#/success';
 
-// فتح رسالة واتساب بعد نجاح تسجيل الطلب
-if (waTab && w.AlphaWhatsApp) {
-  try {
-    waTab.location.href = w.AlphaWhatsApp.url(S.last);
-  } catch (waError) {
-    console.error('[whatsapp]', waError);
-  }
-}
-
-Cart.clear();
-location.hash = '#/success';
+      // بعد ما صفحة النجاح تظهر لحظة، نحوّل العميل على واتساب برسالة الأوردر الجاهزة
+      setTimeout(function () { w.location.href = waUrl; }, 1500);
     } catch (e) {
-     if (waTab && !waTab.closed) {
-  waTab.close();
-}
-  console.error('[createOrder]', e);
+      console.error('[createOrder]', e);
       if (e.code === 'CART_INVALID') {
         var msgs = [];
         (e.issues || []).forEach(function (is) {
