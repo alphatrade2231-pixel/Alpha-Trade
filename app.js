@@ -66,7 +66,7 @@
   }
 
   /* ---------- WhatsApp: رسالة الأوردر الجاهزة لصاحب الشركة ---------- */
-  var OWNER_WHATSAPP = '201114094278'; // 01114094278 بالصيغة الدولية لمصر (بدون + وبدون 0)
+  var OWNER_WHATSAPP = '201505634357'; // 
 
   function waNum(n) {
     return Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
